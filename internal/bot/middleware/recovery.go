@@ -4,7 +4,7 @@ import (
 	"context"
 	"runtime/debug"
 
-	"pokerbot/pkg/logger"
+	"github.com/dmitrymongol/pokerbot/pkg/logger"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )

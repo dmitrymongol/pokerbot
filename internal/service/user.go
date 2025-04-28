@@ -2,8 +2,8 @@ package service
 
 // import (
 // 	"context"
-// 	"pokerbot/internal/domain/model"
-// 	"pokerbot/internal/repository"
+// 	"github.com/dmitrymongol/pokerbot/internal/domain/model"
+// 	"github.com/dmitrymongol/pokerbot/internal/repository"
 // )
 
 // type UserService struct {

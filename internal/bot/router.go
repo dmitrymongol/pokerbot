@@ -2,8 +2,9 @@ package bot
 
 import (
 	"context"
-	"pokerbot/internal/bot/middleware"
-	"pokerbot/pkg/logger"
+
+	"github.com/dmitrymongol/pokerbot/internal/bot/middleware"
+	"github.com/dmitrymongol/pokerbot/pkg/logger"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )

@@ -4,6 +4,11 @@ FROM golang:1.24-alpine AS builder
 # Установка зависимостей для сборки
 RUN apk add --no-cache git ca-certificates
 
+# Настройка модуля Go
+ENV GO111MODULE=on
+ENV GOPATH=/go
+ENV PATH=$PATH:/go/bin
+
 # Создание рабочей директории
 WORKDIR /app
 
@@ -16,7 +21,7 @@ RUN go mod download
 # Копируем исходный код
 COPY . .
 
-# Собираем бинарник
+# Собираем бинарник с правильным модулем
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /bot ./cmd/bot/main.go
 
 # Финальный этап

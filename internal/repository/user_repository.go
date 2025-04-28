@@ -2,7 +2,7 @@ package repository
 
 // import (
 // 	"context"
-// 	"pokerbot/internal/domain/model"
+// 	"github.com/dmitrymongol/pokerbot/internal/domain/model"
 // )
 
 // type UserRepository interface {

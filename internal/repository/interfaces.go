@@ -2,7 +2,8 @@ package repository
 
 import (
 	"context"
-	"pokerbot/internal/model"
+
+	"github.com/dmitrymongol/pokerbot/internal/model"
 )
 
 // Объявляем интерфейсы в отдельном файле

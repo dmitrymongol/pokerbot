@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"pokerbot/internal/model"
+
+	"github.com/dmitrymongol/pokerbot/internal/model"
 )
 
 // Реализация заглушек

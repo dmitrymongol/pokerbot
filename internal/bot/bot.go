@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"pokerbot/internal/api"
-	"pokerbot/internal/repository"
-	"pokerbot/pkg/logger"
-	"pokerbot/pkg/poker"
+	"github.com/dmitrymongol/pokerbot/internal/api"
+	"github.com/dmitrymongol/pokerbot/internal/repository"
+	"github.com/dmitrymongol/pokerbot/pkg/logger"
+	"github.com/dmitrymongol/pokerbot/pkg/poker"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )

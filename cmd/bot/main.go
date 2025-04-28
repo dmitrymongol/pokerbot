@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"pokerbot/internal/bot"
-	"pokerbot/internal/config"
-	"pokerbot/internal/repository"
-	"pokerbot/pkg/logger"
+	"github.com/dmitrymongol/pokerbot/internal/bot"
+	"github.com/dmitrymongol/pokerbot/internal/config"
+	"github.com/dmitrymongol/pokerbot/internal/repository"
+	"github.com/dmitrymongol/pokerbot/pkg/logger"
 )
 
 func main() {

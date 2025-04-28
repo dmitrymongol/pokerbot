@@ -1,4 +1,4 @@
-module pokerbot
+module github.com/dmitrymongol/pokerbot
 
 go 1.24.0
 
