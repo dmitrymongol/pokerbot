@@ -1,0 +1,51 @@
+# Binaries для программ и зависимостей
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Директории сборки
+/bin/
+/dist/
+/pkg/
+/tmp/
+
+# Go workspace файл
+go.work
+
+# Файлы зависимостей
+/vendor/
+
+# Тестовые ковертапы
+*.coverprofile
+
+# IDE и редакторы
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Файлы окружения
+.env
+.env.local
+.env*.local
+
+# Локальные настройки
+*.local
+
+# Файлы кэша Go
+/.cache/
+/go/bin/
+/go/pkg/
+
+# JetBrains IDE
+*.iml
+
+# Опционально (если используется)
+.DS_Store
+debug
