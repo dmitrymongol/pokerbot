@@ -15,6 +15,10 @@ WORKDIR /app
 # Копируем файлы модулей
 COPY go.mod go.sum ./
 
+RUN go mod tidy
+
+RUN go mod verify
+
 # Скачиваем зависимости
 RUN go mod download
 
