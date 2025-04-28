@@ -4,9 +4,9 @@ package handler
 // 	"context"
 // 	"strings"
 
-// 	"github.com/dmitrymongol/pokerbot/internal/model"
-// 	"github.com/dmitrymongol/pokerbot/internal/service"
-// 	"github.com/dmitrymongol/pokerbot/pkg/logger"
+// 	"pokerbot/internal/model"
+// 	"pokerbot/internal/service"
+// 	"pokerbot/pkg/logger"
 
 // 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 // )

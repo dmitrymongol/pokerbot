@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"github.com/dmitrymongol/pokerbot/internal/bot"
-	"github.com/dmitrymongol/pokerbot/internal/config"
-	"github.com/dmitrymongol/pokerbot/internal/repository"
-	"github.com/dmitrymongol/pokerbot/pkg/logger"
+	"pokerbot/internal/bot"
+	"pokerbot/internal/config"
+	"pokerbot/internal/repository"
+	"pokerbot/internal/service"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	}
 
 	// Инициализация логгера
-	logger := logger.New(cfg.Env)
+	logger := service.NewLogger(cfg.Env)
 
 	// Подключение к БД
 	db, err := repository.NewPostgres(cfg.DB.DSN)

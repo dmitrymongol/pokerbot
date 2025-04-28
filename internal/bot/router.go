@@ -3,8 +3,8 @@ package bot
 import (
 	"context"
 
-	"github.com/dmitrymongol/pokerbot/internal/bot/middleware"
-	"github.com/dmitrymongol/pokerbot/pkg/logger"
+	"pokerbot/internal/bot/middleware"
+	"pokerbot/internal/service"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -16,7 +16,7 @@ type Router struct {
 
 type HandlerFunc = middleware.HandlerFunc
 
-func NewRouter(log logger.Logger) *Router {
+func NewRouter(log service.Logger) *Router {
 	r := &Router{}
 	
 	// Инициализируем с дефолтными middleware

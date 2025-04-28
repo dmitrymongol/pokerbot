@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/dmitrymongol/pokerbot/internal/model"
+	"pokerbot/internal/model"
 )
 
 // Реализация заглушек

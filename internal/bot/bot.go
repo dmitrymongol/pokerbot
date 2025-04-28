@@ -8,24 +8,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dmitrymongol/pokerbot/internal/api"
-	"github.com/dmitrymongol/pokerbot/internal/repository"
-	"github.com/dmitrymongol/pokerbot/pkg/logger"
-	"github.com/dmitrymongol/pokerbot/pkg/poker"
+	"pokerbot/internal/api"
+	"pokerbot/internal/repository"
+	"pokerbot/internal/service"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type Bot struct {
     api      *tgbotapi.BotAPI
-    logger   *logger.Logger // Используем указатель
+    logger   *service.Logger // Используем указатель
     userRepo repository.UserRepository
     msgRepo  repository.MessageRepository
 	deepSeek  *api.DeepSeekClient 
 }
 func New(
 	token string,
-	log *logger.Logger, // Принимаем указатель
+	log *service.Logger, // Принимаем указатель
 	userRepo repository.UserRepository,
 	msgRepo repository.MessageRepository,
 ) *Bot {
@@ -141,7 +140,7 @@ func isPokerHandHistory(text string) bool {
 
 func (b *Bot) analyzeHandHistory(text string) string {
     // Парсим историю раздачи
-    history, err := poker.ParseTextHandHistory(text)
+    history, err := service.ParseTextHandHistory(text)
     if err != nil {
         return "❌ Ошибка парсинга: " + err.Error()
     }
@@ -155,7 +154,7 @@ func (b *Bot) analyzeHandHistory(text string) string {
     // }
 
     // Валидация для Mystery Battle Royale
-    validationErrors := poker.ValidateMysteryRoyale(history)
+    validationErrors := service.ValidateMysteryRoyale(history)
 
     result := formatAnalysisResult(history, validationErrors)
     
@@ -173,7 +172,7 @@ func (b *Bot) analyzeHandHistory(text string) string {
 }
 
 // Обновляем функцию formatAnalysisResult в файле bot/bot.go
-func formatAnalysisResult(hh *poker.HandHistory, errors []error) string {
+func formatAnalysisResult(hh *service.HandHistory, errors []error) string {
     builder := strings.Builder{}
     
     // Заголовок и базовая информация

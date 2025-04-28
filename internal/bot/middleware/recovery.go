@@ -4,12 +4,12 @@ import (
 	"context"
 	"runtime/debug"
 
-	"github.com/dmitrymongol/pokerbot/pkg/logger"
+	"pokerbot/internal/service"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func RecoveryMiddleware(log logger.Logger) func(HandlerFunc) HandlerFunc {
+func RecoveryMiddleware(log service.Logger) func(HandlerFunc) HandlerFunc {
 	return func(next HandlerFunc) HandlerFunc {
 		return func(ctx context.Context, bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 			defer func() {
