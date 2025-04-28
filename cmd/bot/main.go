@@ -1,20 +1,19 @@
 package main
 
 import (
-	"log"
-
 	"pokerbot/internal/bot"
 	"pokerbot/internal/config"
 	"pokerbot/internal/repository"
 	"pokerbot/internal/service"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Инициализация конфига
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("Config error: %v", err)
-	}
+	
+	err := godotenv.Load()
+	// Load configuration
+	cfg := config.Load()
 
 	// Инициализация логгера
 	logger := service.NewLogger(cfg.Env)

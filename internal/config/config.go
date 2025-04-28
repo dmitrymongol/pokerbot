@@ -1,38 +1,36 @@
 package config
 
 import (
-	"github.com/caarlos0/env/v9"
-	"github.com/joho/godotenv"
+	"log"
+
+	"github.com/kelseyhightower/envconfig"
 )
 
-type DeepSeekConfig struct {
-    APIKey  string `env:"DEEPSEEK_API_KEY,required"`
-    BaseURL string `env:"DEEPSEEK_API_URL" envDefault:"https://api.deepseek.com/v1"`
-}
+// type DeepSeekConfig struct {
+//     APIKey  string `envconfig:"DEEPSEEK_API_KEY,required"`
+//     BaseURL string `envconfig:"DEEPSEEK_API_URL" envDefault:"https://api.deepseek.com/v1"`
+// }
 type Config struct {
-	Env  string `env:"ENV" envDefault:"development"`
+	Env  string `envconfig:"ENV" default:"development"`
 	DB   DBConfig
 	Telegram TelegramConfig
 }
 
 type DBConfig struct {
-	DSN           string `env:"DB_DSN" envDefault:""`
-	MigrationsPath string `env:"DB_MIGRATIONS_PATH" envDefault:"./migrations"`
+	DSN           string `envconfig:"DB_DSN" default:""`
+	MigrationsPath string `envconfig:"DB_MIGRATIONS_PATH" default:"./migrations"`
 }
 
 type TelegramConfig struct {
-	Token string `env:"TELEGRAM_TOKEN,required"`
+	Token string `envconfig:"TELEGRAM_TOKEN" required:"true"`
+	
 }
 
-func Load() (*Config, error) {
-	// Загружаем .env файл
-	if err := godotenv.Load(); err != nil {
-		return nil, err
+func Load() *Config {
+	var cfg Config
+	err := envconfig.Process("", &cfg)
+	if err != nil {
+		log.Fatal("Failed to load configuration: ", err)
 	}
-
-	cfg := &Config{}
-	if err := env.Parse(cfg); err != nil {
-		return nil, err
-	}
-	return cfg, nil
+	return &cfg
 }
