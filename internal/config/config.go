@@ -14,6 +14,9 @@ type Config struct {
 	Env  string `envconfig:"ENV" default:"development"`
 	DB   DBConfig
 	Telegram TelegramConfig
+	Yandex YandexConfig
+	AllowedChats string `envconfig:"ALLOWED_CHATS" required:"true"`
+	AdminUsers string `envconfig:"ADMIN_USERS" required:"true"`
 }
 
 type DBConfig struct {
@@ -23,6 +26,12 @@ type DBConfig struct {
 
 type TelegramConfig struct {
 	Token string `envconfig:"TELEGRAM_TOKEN" required:"true"`
+	
+}
+type YandexConfig struct {
+	YandexOauthToken string `envconfig:"YANDEX_OAUTH_TOKEN" required:"true"`
+	YandexFolderID string `envconfig:"YANDEX_FOLDER_ID" required:"true"`
+	
 	
 }
 

@@ -20,26 +20,62 @@ type Bot struct {
     logger   *service.Logger // Используем указатель
     userRepo repository.UserRepository
     msgRepo  repository.MessageRepository
-	deepSeek  *api.DeepSeekClient 
+	// deepSeek  *api.DeepSeekClient
+	yandexGPT  *api.YandexGPTClient
+	allowedChats map[int64]struct{}
+    adminUserIDs map[int64]struct{}
 }
 func New(
 	token string,
 	log *service.Logger, // Принимаем указатель
 	userRepo repository.UserRepository,
 	msgRepo repository.MessageRepository,
+	yandexToken string,
+    yandexFolderID string,
+	allowedChatsStr string,
+	adminUserIDsStr string, // Строка с ID админов через запятую
 ) *Bot {
-	api, err := tgbotapi.NewBotAPI(token)
+	tgbotapi, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create bot")
 	}
-
 	return &Bot{
-		api:      api,
+		api:      tgbotapi,
 		logger:   log,
 		userRepo: userRepo,
 		msgRepo:  msgRepo,
+		yandexGPT: api.NewYandexGPTClient(yandexToken, yandexFolderID, log),
+        allowedChats: parseIDs(allowedChatsStr, log, "allowed chat"),
+        adminUserIDs: parseIDs(adminUserIDsStr, log, "admin user"),
 	}
 }
+
+// Общая функция парсинга ID
+func parseIDs(input string, log *service.Logger, idType string) map[int64]struct{} {
+    ids := make(map[int64]struct{})
+    if input == "" {
+        return ids
+    }
+
+    for _, s := range strings.Split(input, ",") {
+        s = strings.TrimSpace(s)
+        id, err := strconv.ParseInt(s, 10, 64)
+        if err != nil {
+            log.Error().Str("type", idType).Str("value", s).Msg("Invalid ID")
+            continue
+        }
+        ids[id] = struct{}{}
+    }
+
+    return ids
+}
+
+// Проверка прав доступа
+func (b *Bot) isAdmin(userID int64) bool {
+    _, ok := b.adminUserIDs[userID]
+    return ok
+}
+
 
 func (b *Bot) Start() error {
 	b.logger.Info().Msg("Starting bot...")
@@ -60,11 +96,36 @@ func (b *Bot) Start() error {
 
 func (b *Bot) handleMessage(ctx context.Context, msg *tgbotapi.Message) {
 	// Проверяем адресовано ли сообщение боту
-	if !b.isMessageForBot(msg) {
-		return
-	}
+    if msg.Chat.IsPrivate() {
+        if !b.isAdmin(msg.From.ID) {
+            b.logger.Warn().
+                Int64("user_id", msg.From.ID).
+                Str("username", msg.From.UserName).
+                Msg("Unauthorized private message attempt")
+			reply := tgbotapi.NewMessage(msg.From.ID, msg.From.UserName + "Unauthorized toi send private messages")	
+			b.api.Send(reply)		
+            return
+        }
+		b.processMessage(msg)
+        return
+    }
 
-	// Очищаем текст от упоминания бота
+    // Для групповых чатов проверяем вайтлист
+    if _, ok := b.allowedChats[msg.Chat.ID]; !ok {
+        b.logger.Debug().
+            Int64("chat_id", msg.Chat.ID).
+            Str("chat_title", msg.Chat.Title).
+            Msg("Message from non-whitelisted group")
+		reply := tgbotapi.NewMessage(msg.Chat.ID, "Chat non-whitelisted")	
+		b.api.Send(reply)	
+        return
+    }
+
+	b.processMessage(msg)
+
+}
+
+func (b *Bot)  processMessage(msg *tgbotapi.Message) {
 	text := b.cleanMessageText(msg.Text, b.api.Self.UserName)
 
 	if isPokerHandHistory(text) {
@@ -74,12 +135,6 @@ func (b *Bot) handleMessage(ctx context.Context, msg *tgbotapi.Message) {
         b.api.Send(reply)
         return
     }
-
-	if strings.ToLower(strings.TrimSpace(text)) == "привет" {
-		reply := tgbotapi.NewMessage(msg.Chat.ID, "Привет, "+msg.From.FirstName)
-		reply.ReplyToMessageID = msg.MessageID
-		b.api.Send(reply)
-	}
 }
 
 // Проверяем, адресовано ли сообщение боту
@@ -139,36 +194,36 @@ func isPokerHandHistory(text string) bool {
 }
 
 func (b *Bot) analyzeHandHistory(text string) string {
-    // Парсим историю раздачи
     history, err := service.ParseTextHandHistory(text)
     if err != nil {
         return "❌ Ошибка парсинга: " + err.Error()
     }
 
-    if err := history.ParseBlinds(text); err != nil {
-        return "❌ Ошибка блайндов: " + err.Error()
-    }
-    
-    // if err := history.ParseBlindIncrease(text); err != nil {
-    //     return "⚠️ Предупреждение: " + err.Error()
-    // }
-
-    // Валидация для Mystery Battle Royale
-    validationErrors := service.ValidateMysteryRoyale(history)
-
+    // validationErrors := service.ValidateMysteryRoyale(history)
+	validationErrors := []error{}
     result := formatAnalysisResult(history, validationErrors)
-    
-    if len(validationErrors) == 0 && strings.Contains(text, "Hero ?") {
-        advice, err := b.deepSeek.GetPokerAdvice(text)
-        if err == nil {
-            result += "\n\n🎓 **Совет DeepSeek:**\n" + advice
+
+    if len(validationErrors) == 0 {
+        advice, err := b.getGTOAdvice(text)
+        if err != nil {
+            b.logger.Error().Err(err).Msg("GPT API error")
+            result += "\n\n⚠️ Не удалось получить совет"
         } else {
-            b.logger.Error().Err(err).Msg("DeepSeek API error")
-            result += "\n\n⚠️ Не удалось получить совет (сервис недоступен)"
+            result += formatGPTAdvice(advice)
         }
     }
     
     return result
+}
+
+func (b *Bot) getGTOAdvice(handHistory string) (string, error) {
+    return b.yandexGPT.GetPokerAdvice(handHistory)
+}
+
+func formatGPTAdvice(advice string) string {
+    // Упрощаем форматирование
+    return fmt.Sprintf("\n\n🎓 **GTO Совет:**\n%s", 
+        strings.ReplaceAll(advice, "\n", "\n• "))
 }
 
 // Обновляем функцию formatAnalysisResult в файле bot/bot.go
@@ -193,7 +248,7 @@ func formatAnalysisResult(hh *service.HandHistory, errors []error) string {
 
     // Валидация
     if len(errors) == 0 {
-        builder.WriteString("\n✅ *Валидна для Mystery Battle Royale*")
+        builder.WriteString("\n✅ *Раздача валидна*")
     } else {
         builder.WriteString("\n❌ *Нарушения:*\n")
         for _, err := range errors {

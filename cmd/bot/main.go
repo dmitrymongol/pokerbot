@@ -40,6 +40,10 @@ func main() {
 		logger,
 		userRepo,
 		messageRepo,
+		cfg.Yandex.YandexOauthToken,
+		cfg.Yandex.YandexFolderID,
+		cfg.AllowedChats,
+		cfg.AdminUsers,
 	)
 
 	if err := bot.Start(); err != nil {
