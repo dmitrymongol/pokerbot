@@ -176,10 +176,10 @@ func (b *Bot) cleanMessageText(text, botUsername string) string {
 
 func isPokerHandHistory(text string) bool {
     patterns := []string{
-        `(?i)Hand #\d+`,
-        `Blinds: [\d,]+/[\d,]+`,
-        `\*\*\* HOLE CARDS \*\*\*`,
-        `Dealt to .+\[.+\]`,
+        `(?i)Hand #[\dA-Z]+`,       // Номер руки с буквами и цифрами
+        `\d+/[\d,]+\)`,             // Блайнды в уровне (например: Level12(400/800)
+        `\*\*\* HOLE CARDS \*\*\*`, 
+        `Dealt to .+\[.+\]`,        // Раздача карт игроку
     }
     
     matched := 0
@@ -190,7 +190,7 @@ func isPokerHandHistory(text string) bool {
         }
     }
     
-    return matched >= 3 // Минимум 3 совпадения
+    return matched >= 3
 }
 
 func (b *Bot) analyzeHandHistory(text string) string {
